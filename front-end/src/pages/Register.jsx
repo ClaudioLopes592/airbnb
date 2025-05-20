@@ -2,37 +2,47 @@ import React, { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import axios from "axios";
 
-const Login = ({ user, setUser }) => {
+const Register = ({ setUser }) => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email && password) {
-      try {
-        const { data: userDoc } = await axios.post("/users/login", {
-          email,
-          password,
-        });
-        setUser(userDoc);
-        setRedirect(true);
-      } catch (error) {
-        alert(`Deu um erro ao logar ${error.response.data}`);
-      }
-    } else {
-      alert("Você precisa preencher o e-mail e a senha!");
-    }
+    // if (email && password) {
+    //   try {
+    //     const { data: userDoc } = await axios.post("/users/login", {
+    //       email,
+    //       password,
+    //     });
+    //     setUser(userDoc);
+    //     setRedirect(true);
+    //   } catch (error) {
+    //     alert(`Deu um erro ao logar ${error.response.data}`);
+    //   }
+    // } else {
+    //   alert("Você precisa preencher o e-mail e a senha!");
+    // }
   };
-  if (redirect || user) {
+  if (redirect) {
     return <Navigate to="/" />;
   }
 
   return (
     <section className="flex items-center">
       <div className="mx-auto flex w-full max-w-96 flex-col items-center gap-4">
-        <h1 className="text-3xl font-bold">Faça seu login</h1>
+        <h1 className="text-3xl font-bold">Faça seu Cadastro</h1>
         <form className="flex w-full flex-col gap-2" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            className="w-full rounded-full border border-gray-300 px-4 py-2"
+            placeholder="Digite seu nome"
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+            }}
+          />
           <input
             type="email"
             className="w-full rounded-full border border-gray-300 px-4 py-2"
@@ -52,14 +62,14 @@ const Login = ({ user, setUser }) => {
             }}
           />
           <button className="bg-primary-400 w-full cursor-pointer rounded-full border border-gray-300 px-4 py-2 font-bold text-white">
-            Login
+            Registrar
           </button>
         </form>
         <p>
-          Ainda não tem conta?
-          <Link to="/register" className="font-semibold text-blue-700">
+          Já tem uma conta?
+          <Link to="/login" className="font-semibold text-blue-700">
             {" "}
-            Registre-se aqui
+            Logue aqui
           </Link>
         </p>
       </div>
@@ -67,4 +77,4 @@ const Login = ({ user, setUser }) => {
   );
 };
 
-export default Login;
+export default Register;

@@ -4,7 +4,7 @@ import User from "./model.js";
 import bcrypt from "bcryptjs";
 
 const router = Router();
-const bcryptSalt = bcrypt.genSaltSync()
+const bcryptSalt = bcrypt.genSaltSync();
 
 router.get("/", async (request, response) => {
   connectDb();
@@ -27,6 +27,25 @@ router.post("/", async (request, response) => {
       password: encryptedPassword,
     });
     response.json(newUserDoc);
+  } catch (error) {
+    response.status(500).json(error);
+  }
+});
+
+router.post("/login", async (request, response) => {
+  connectDb();
+  const { email, password } = request.body;
+  try {
+    const userDoc = await User.findOne({ email });
+    if (userDoc) {
+    const passwordCorrect = bcrypt.compareSync(password, userDoc.password);
+    const {name, _id} = userDoc;
+    passwordCorrect
+      ? response.json({ name, email, _id })
+      : response.status(400).json("Senha inválida!");
+    } else {
+      response.status(400).json("Usuário não localizado!")
+    }
   } catch (error) {
     response.status(500).json(error);
   }
