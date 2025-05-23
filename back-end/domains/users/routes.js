@@ -22,12 +22,10 @@ router.get("/", async (request, response) => {
 router.get("/profile", async (request, response) => {
   const { token } = request.cookies;
   if (token) {
-    try {
-      const userInfo = jwt.verify(token, JWT_SECRET_KEY);
+    jwt.verify(token, JWT_SECRET_KEY, {}, (error, userInfo) => {
+      if (error) throw error;
       response.json(userInfo);
-    } catch (error) {
-      response.status(404).json(error);
-    }
+    });
   } else {
     response.json(null);
   }
@@ -44,12 +42,15 @@ router.post("/", async (request, response) => {
       password: encryptedPassword,
     });
     const { _id } = newUserDoc;
-    const newUserObj = { name, email, _id }
-    const token = jwt.sign(newUserObj, JWT_SECRET_KEY);
-    response.cookie("token", token).json(newUserObj);
+    const newUserObj = { name, email, _id };
+    jwt.sign(newUserObj, JWT_SECRET_KEY, {}, (error, token) => {
+      if (error) throw error;
+      response.cookie("token", token).json(newUserObj);
+    });
     response.json(newUserObj);
   } catch (error) {
     response.status(500).json(error);
+    throw error;
   }
 });
 
@@ -75,5 +76,9 @@ router.post("/login", async (request, response) => {
     response.status(500).json(error);
   }
 });
+
+router.post("/logout", (request, response) => {
+  response.clearCookie("token").json("Deslogado com sucesso!")
+})
 
 export default router;
